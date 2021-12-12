@@ -4,12 +4,12 @@ import shutil
 import cv2
 import random
 
-source_dir = "D:/2021-2022WinterSemester/ISP/project/facemaskdetection/data/mask_data"
-dest_dir = "D:/2021-2022WinterSemester/ISP/project/facemaskdetection/data/classification_data"
+source_dir = "/home/duhuaiyu/Downloads/facemaskdata/"
+dest_dir = "/home/duhuaiyu/Downloads/facemaskdata/classification_data"
 resize_dim=(24,24)
 catagory = ["train","validation","test"]
 dirs = ["nomask","mask","incorrect","background"]
-random_background = 5
+random_background = 20
 background_size = [40, 60, 80, 100, 120]
 def remove_folder_contents(path):
     if os.path.exists(path):
@@ -65,7 +65,7 @@ def create_rotation (img,num, dir,name):
     center = (w / 2, h / 2)
 
     for i in range(num):
-        degree = random.randint(-10,10)
+        degree = random.randint(-30,30)
         M = cv2.getRotationMatrix2D(center, degree, scale  =1.2)
         rotated = cv2.warpAffine(img, M, (w, h))
         save_path = os.path.join(dest_dir,dir ,name+"_"+str(i)+".png")
@@ -109,20 +109,21 @@ if __name__ == '__main__':
                 flip = cv2.flip(resized,1)
                 save_file = os.path.join(save_path,file_name+"_flip_"+str(idx)+".png")
                 cv2.imwrite(save_file,flip)
-                create_rotation(resized,3,save_path,file_name+"_rotation");
-                create_rotation(flip,3,save_path,file_name+"_flip_rotation");
+                create_rotation(resized,6,save_path,file_name+"_rotation");
+                create_rotation(flip,6,save_path,file_name+"_flip_rotation");
             elif labels["labels"][idx] == 2:
                 flip = cv2.flip(resized,1)
                 save_file = os.path.join(save_path,file_name+"_flip_"+str(idx)+".png")
                 cv2.imwrite(save_file,flip)
-                create_rotation(resized,10,save_path,file_name+"_rotation");
-                create_rotation(flip,10,save_path,file_name+"_flip_rotation");
+                create_rotation(resized,20,save_path,file_name+"_rotation");
+                create_rotation(flip,20,save_path,file_name+"_flip_rotation");
 
         image_shape = org_img.shape
         for i in range(random_background):
-            x = random.randint(0,image_shape[0]-background_size[i])
-            y = random.randint(0,image_shape[1]-background_size[i])
-            new_img = org_img[x:x+background_size[i],y:y+background_size[i]]
+            size_index = random.randint(0,len(background_size)-1)
+            x = random.randint(0,image_shape[1]-background_size[size_index])
+            y = random.randint(0,image_shape[0]-background_size[size_index])
+            new_img = org_img[y:y+background_size[size_index],x:x+background_size[size_index]]
             resized = cv2.resize(new_img, resize_dim, interpolation = cv2.INTER_CUBIC)
             save_path = os.path.join(dest_dir_sub,dirs[3],file_name+"_"+str(i)+".png")
             cv2.imwrite(save_path,resized)
